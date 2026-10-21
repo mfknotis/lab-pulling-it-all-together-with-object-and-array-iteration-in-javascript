@@ -114,3 +114,53 @@ function gameObject() {
         },
     };
 }
+
+
+function allPlayers() {
+  const game = gameObject();
+  return Object.assign({}, game.home.players, game.away.players);
+}
+
+function numPointsScored(playerName) {
+  return allPlayers()[playerName].points;
+}
+
+function shoeSize(playerName) {
+  return allPlayers()[playerName].shoe;
+}
+
+function teamColors(teamName) {
+  const game = gameObject();
+  for (const side in game) {
+    if (game[side].teamName === teamName) {
+      return game[side].colors;
+    }
+  }
+}
+
+function teamNames() {
+  const game = gameObject();
+  return [game.home.teamName, game.away.teamName];
+}
+
+function playerNumbers(teamName) {
+  const game = gameObject();
+  for (const side in game) {
+    if (game[side].teamName === teamName) {
+      return Object.values(game[side].players).map(p => p.number);
+    }
+  }
+}
+
+function playerStats(playerName) {
+  return allPlayers()[playerName];
+}
+
+function bigShoeRebounds() {
+  const players = Object.values(allPlayers());
+  let biggest = players[0];
+  for (const p of players) {
+    if (p.shoe > biggest.shoe) biggest = p;
+  }
+  return biggest.rebounds;
+}
