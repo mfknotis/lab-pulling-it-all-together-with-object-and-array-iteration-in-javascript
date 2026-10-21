@@ -1,166 +1,48 @@
-function gameObject() {
-    return {
-        home: {
-            teamName: "Brooklyn Nets",
-            colors: ["Black", "White"],
-            players: {
-                "Alan Anderson": {
-                    number: 0,
-                    shoe: 16,
-                    points: 22,
-                    rebounds: 12,
-                    assists: 12,
-                    steals: 3,
-                    blocks: 1,
-                    slamDunks: 1,
-                },
-                "Reggie Evens": {
-                    number: 30,
-                    shoe: 14,
-                    points: 12,
-                    rebounds: 12,
-                    assists: 12,
-                    steals: 12,
-                    blocks: 12,
-                    slamDunks: 7,
-                },
-                "Brook Lopez": {
-                    number: 11,
-                    shoe: 17,
-                    points: 17,
-                    rebounds: 19,
-                    assists: 10,
-                    steals: 3,
-                    blocks: 1,
-                    slamDunks: 15,
-                },
-                "Mason Plumlee": {
-                    number: 1,
-                    shoe: 19,
-                    points: 26,
-                    rebounds: 12,
-                    assists: 6,
-                    steals: 3,
-                    blocks: 8,
-                    slamDunks: 5,
-                },
-                "Jason Terry": {
-                    number: 31,
-                    shoe: 15,
-                    points: 19,
-                    rebounds: 2,
-                    assists: 2,
-                    steals: 4,
-                    blocks: 11,
-                    slamDunks: 1,
-                },
-            },
-        },
-        away: {
-            teamName: "Charlotte Hornets",
-            colors: ["Turquoise", "Purple"],
-            players: {
-                "Jeff Adrien": {
-                    number: 4,
-                    shoe: 18,
-                    points: 10,
-                    rebounds: 1,
-                    assists: 1,
-                    steals: 2,
-                    blocks: 7,
-                    slamDunks: 2,
-                },
-                "Bismack Biyombo": {
-                    number: 0,
-                    shoe: 16,
-                    points: 12,
-                    rebounds: 4,
-                    assists: 7,
-                    steals: 7,
-                    blocks: 15,
-                    slamDunks: 10,
-                },
-                "DeSagna Diop": {
-                    number: 2,
-                    shoe: 14,
-                    points: 24,
-                    rebounds: 12,
-                    assists: 12,
-                    steals: 4,
-                    blocks: 5,
-                    slamDunks: 5,
-                },
-                "Ben Gordon": {
-                    number: 8,
-                    shoe: 15,
-                    points: 33,
-                    rebounds: 3,
-                    assists: 2,
-                    steals: 1,
-                    blocks: 1,
-                    slamDunks: 0,
-                },
-                "Brendan Hayword": {
-                    number: 33,
-                    shoe: 15,
-                    points: 6,
-                    rebounds: 12,
-                    assists: 12,
-                    steals: 22,
-                    blocks: 5,
-                    slamDunks: 12,
-                },
-            },
-        },
-    };
+const readline = require("readline");
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+const questions = [
+  { q: "What is 2 + 2?", options: ["3", "4", "5"], answer: 1 },
+  { q: "Capital of Kenya?", options: ["Nairobi", "Mombasa", "Kisumu"], answer: 0 },
+  { q: "Which is a JS array method?", options: ["map", "print", "loop"], answer: 0 },
+];
+
+let current = 0, score = 0, timeLeft = 60;
+let timer;
+
+function startGame() {
+  console.log("\n🎯 Welcome to the Trivia Quiz! You have 60 seconds.\n");
+  timer = setInterval(() => {
+    timeLeft--;
+    if (timeLeft <= 0) { console.log("\n⏰ Time's up!"); endGame(); }
+  }, 1000);
+  askQuestion();
 }
 
-
-function allPlayers() {
-  const game = gameObject();
-  return Object.assign({}, game.home.players, game.away.players);
+function askQuestion() {
+  if (current >= questions.length) return endGame();
+  const { q, options } = questions[current];
+  console.log(`Q${current + 1}: ${q}`);
+  options.map((o, i) => console.log(` ${i + 1}. ${o}`));
+  rl.question("Your answer (number): ", (input) => {
+    checkAnswer(Number(input) - 1);
+  });
 }
 
-function numPointsScored(playerName) {
-  return allPlayers()[playerName].points;
-}
-
-function shoeSize(playerName) {
-  return allPlayers()[playerName].shoe;
-}
-
-function teamColors(teamName) {
-  const game = gameObject();
-  for (const side in game) {
-    if (game[side].teamName === teamName) {
-      return game[side].colors;
-    }
+function checkAnswer(choice) {
+  if (choice === questions[current].answer) {
+    score++;
+    console.log("✅ Correct!\n");
+  } else {
+    console.log("❌ Wrong!\n");
   }
+  current++;
+  askQuestion();
 }
 
-function teamNames() {
-  const game = gameObject();
-  return [game.home.teamName, game.away.teamName];
-}
-
-function playerNumbers(teamName) {
-  const game = gameObject();
-  for (const side in game) {
-    if (game[side].teamName === teamName) {
-      return Object.values(game[side].players).map(p => p.number);
-    }
-  }
-}
-
-function playerStats(playerName) {
-  return allPlayers()[playerName];
-}
-
-function bigShoeRebounds() {
-  const players = Object.values(allPlayers());
-  let biggest = players[0];
-  for (const p of players) {
-    if (p.shoe > biggest.shoe) biggest = p;
-  }
-  return biggest.rebounds;
-}
+function endGame() {
+  clearInterval(timer);
+  console.log(`🏁 Game over! Score: ${score}/${questions.length}`);
+  console.log(`Time used: ${60 - timeLeft}s`);
+  rl.close();
+  process.exit(0);
